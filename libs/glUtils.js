@@ -1,7 +1,7 @@
 (function(global){
 
     var glUtils = {
-      VERSION : '0.0.1',
+      VERSION : '0.0.4',
       checkWebGL: function(canvas) {
         /**
          * Check if WebGL is available.
@@ -61,6 +61,39 @@
       },
   
       SL: {
+        sourceFromHtml: function(opts) {
+          var opts = opts || {};
+          this.elemName = opts.elemName || "shader";
+          this.dataType = opts.dataType || "data-type";
+          this.dataVersion = opts.dataVersion || "data-version";
+          this.shaderElems = document.getElementsByName(this.elemName);
+          this.Shaders = this.Shaders || {};
+          this.slShaderCount = this.shaderElems.length;
+          for(var i = 0; i < this.slShaderCount; i++) {
+            var shader = this.shaderElems[i];
+            if (!shader) {
+              return null;
+            }
+  
+            var source = "";
+            var currentChild = shader.firstChild;
+            while (currentChild) {
+              if (currentChild.nodeType == currentChild.TEXT_NODE) {
+                source += currentChild.textContent;
+              }
+              currentChild = currentChild.nextSibling;
+            }
+  
+            var version = shader.getAttribute(this.dataVersion);
+            if(!this.Shaders[version]) {
+              this.Shaders[version] = {
+                vertex: '',
+                fragment: ''
+              };
+            }
+            this.Shaders[version][shader.getAttribute(this.dataType)] = source;
+          }
+        },
         /*
          * Ajax stuff
          */
@@ -139,4 +172,3 @@
     global.glUtils = glUtils;
   
   }(window || this));
-  
